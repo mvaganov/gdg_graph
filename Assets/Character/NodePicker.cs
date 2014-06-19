@@ -19,7 +19,9 @@ public class NodePicker : MonoBehaviour {
 	/// <summary>particle effect user interface visualization</summary>
 	public GameObject cursorSelect, cursorStart, cursorGoal;
 	/// <summary>UI text variables </summary>
-	string txtSelected = "", txtStart = "?", txtGoal = "?", txtNumberOfNodes;
+	string txtSelected = "", txtStart = "?", txtGoal = "?", txtNumberOfNodes, txtHeuristicWeight;
+	/// <summary>transform that shows a bird's eye view of the graph</summary>
+	public Transform skyViewTransform;
 
 	void RefreshUIText()
 	{
@@ -27,6 +29,7 @@ public class NodePicker : MonoBehaviour {
 		txtStart = (aStar.startObj)?aStar.startObj.name:"?";
 		txtGoal = (aStar.goalObj)?aStar.goalObj.name:"?";
 		txtNumberOfNodes = graph.numberOfNodes.ToString();
+		txtHeuristicWeight = Astar.distanceHeuristicWeight.ToString();
 	}
 
 	void Start ()
@@ -117,6 +120,7 @@ public class NodePicker : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.I)) { UI_Iterate(); }
 		if (Input.GetKeyDown(KeyCode.C)) { graph.connectBothWays = !graph.connectBothWays; }
 		if (Input.GetKeyDown(KeyCode.R)) { UI_Reset(); }
+		if (Input.GetKeyDown(KeyCode.Y)) { UI_SkyView(); }
 	}
 
 	bool showControls = false;
@@ -156,6 +160,14 @@ public class NodePicker : MonoBehaviour {
 				if(aStar.CanIterate()){if(GUILayout.Button("A* [I]terate")) UI_Iterate();}
 				else{GUILayout.Label("A* can't iterate");}
 				GUILayout.BeginHorizontal();
+				GUILayout.Label("Heuristic Weight");
+				float weight;
+				txtHeuristicWeight = GUILayout.TextField(txtHeuristicWeight, 4);
+				if (float.TryParse(txtHeuristicWeight, out weight)) {
+					Astar.distanceHeuristicWeight = weight;
+				}
+				GUILayout.EndHorizontal();
+				GUILayout.BeginHorizontal();
 				graph.connectBothWays = GUILayout.Toggle(graph.connectBothWays, "Dual [C]onnection");
 				GUILayout.EndHorizontal();
 				GUILayout.BeginHorizontal();
@@ -166,7 +178,26 @@ public class NodePicker : MonoBehaviour {
 					GUILayout.Label("Nodes");
 				GUILayout.EndHorizontal();
 				if (GUILayout.Button("[R]eset Graph")) UI_Reset();
+				if (GUILayout.Button("Sk[Y] View")) UI_SkyView();
 			GUILayout.EndVertical();
+		}
+	}
+	Transform oldCameraParent;
+	Vector3 oldCameraOffset;
+	Quaternion oldCameraRotation;
+	void UI_SkyView() {
+		Camera c = Camera.main;
+		if (c.transform.parent != skyViewTransform) {
+			oldCameraParent = c.transform.parent;
+			oldCameraOffset = c.transform.localPosition;
+			oldCameraRotation = c.transform.localRotation;
+			c.transform.parent = skyViewTransform;
+			c.transform.localPosition = Vector3.zero;
+			c.transform.localRotation = Quaternion.identity;
+		} else {
+			c.transform.parent = oldCameraParent;
+			c.transform.localPosition = oldCameraOffset;
+			c.transform.localRotation = oldCameraRotation;
 		}
 	}
 	void UI_SetStart()

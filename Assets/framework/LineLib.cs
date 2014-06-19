@@ -138,7 +138,7 @@ public class LineLib : MonoBehaviour
 	{
 		Transform t = FindGlobal().transform;
 		List<GameObject> list = new List<GameObject>();
-		for(int i = 0; i < t.GetChildCount(); ++i){
+		for(int i = 0; i < t.childCount; ++i){
 			list.Add(t.GetChild(i).gameObject);
 		}
 		for(int i = 0; i < list.Count; ++i){

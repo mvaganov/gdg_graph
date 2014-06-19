@@ -8,6 +8,8 @@ public class Astar : MonoBehaviour {
 	public bool waitToIterate = true;
 	public bool drawLines = true;
 	public List<List<Graph.Node>> foundPaths = new List<List<Graph.Node>>();
+
+	public static float distanceHeuristicWeight = 10;
 	
 	private List<LineRenderer> pathLines = new List<LineRenderer>();
 	
@@ -279,7 +281,7 @@ public class Astar : MonoBehaviour {
 		}
 		public static float heuristic_cost_estimate(Graph.Node start, Graph.Node goal)
 		{
-			return dist_between(start, goal) * 10;
+			return dist_between(start, goal) * distanceHeuristicWeight;
 		}
 		public static Graph.Node smallestFrom(List<Graph.Node> list, Dictionary<Graph.Node, float> values)
 		{
